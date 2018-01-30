@@ -10,7 +10,7 @@ cd $GOPATH/src/github.com/kata-containers/proxy && make && make install
 cd $GOPATH/src/github.com/kata-containers/shim && make && make install
 cd $GOPATH/src/github.com/kata-containers/runtime && make && make install
 
-sudo sed -i -e 's/^# *\(enable_debug\).*=.*$/\1 = true/g' /usr/share/defaults/kata-containers/configuration.toml
+sed -i -e 's/^# *\(enable_debug\).*=.*$/\1 = true/g' /usr/share/defaults/kata-containers/configuration.toml
 
 cd $GOPATH/src/github.com/kata-containers/proxy && make && make install
 cd $GOPATH/src/github.com/kata-containers/shim && make && make install
@@ -37,10 +37,11 @@ date=$(date +%Y-%m-%d-%T.%N%z)
 image="kata-containers-${date}-${commit}"
 
 install -o root -g root -m 0640 -D kata-containers.img "/usr/share/kata-containers/${image}"
-(cd /usr/share/kata-containers && sudo ln -sf "$image" kata-containers.img)
+(cd /usr/share/kata-containers && ln -sf "$image" kata-containers.img)
 
+mkdir -p /etc/systemd/system/docker.service.d
 
-cat <<EOF | sudo tee /etc/systemd/system/docker.service.d/kata-containers.conf
+cat <<EOF | tee /etc/systemd/system/docker.service.d/kata-containers.conf
 [Service]
 Type=simple
 ExecStart=
@@ -48,5 +49,5 @@ ExecStart=/usr/bin/dockerd -D --default-runtime runc --add-runtime kata-runtime=
 EOF
 
 
-sudo systemctl daemon-reload
-sudo systemctl restart docker
+systemctl daemon-reload
+systemctl restart docker

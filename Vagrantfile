@@ -3,8 +3,8 @@
 
 BOX_IMAGE = "ubuntu/xenial64"
 HOSTNAME = "kata-dev"
-#BRIDGE_IF = "enp6s0"
-BRIDGE_IF = "wlp5s0"
+BRIDGE_IF = "enp6s0"
+#BRIDGE_IF = "wlp5s0"
 
 GO_VER = "1.9.3"
 
