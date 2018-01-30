@@ -90,6 +90,8 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
     apt-get -y install apt-transport-https ca-certificates wget software-properties-common
     add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    sh -c "echo 'deb http://download.opensuse.org/repositories/home:/clearcontainers:/clear-containers-3/xUbuntu_$(lsb_release -rs)/ /' >> /etc/apt/sources.list.d/clear-containers.list"
+    wget -qO - http://download.opensuse.org/repositories/home:/clearcontainers:/clear-containers-3/xUbuntu_$(lsb_release -rs)/Release.key | sudo apt-key add -
     wget -qO - https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
     if [ ! -f /tmp/go#{GO_VER}.linux-amd64.tar.gz ]
     then
@@ -98,7 +100,7 @@ Vagrant.configure("2") do |config|
     fi
 
     apt-get update && apt-get -y full-upgrade 
-    apt-get -y install docker-ce make gcc
+    apt-get -y install docker-ce make gcc cc-runtime cc-proxy cc-shim
     systemctl enable docker.service
     systemctl restart docker.service
 
@@ -108,14 +110,5 @@ Vagrant.configure("2") do |config|
     echo "export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin" >> /etc/profile
     echo "export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin" >> /root/.bashrc
 
-    source $HOME/.bashrc
-
-    go get -d github.com/kata-containers/proxy > /dev/null 2>&1
-    go get -d github.com/kata-containers/shim > /dev/null 2>&1
-    go get -d github.com/kata-containers/runtime > /dev/null 2>&1
-    go get -d github.com/kata-containers/agent > /dev/null 2>&1
-    go get -d github.com/kata-containers/osbuilder > /dev/null 2>&1
-
-    cd $GOPATH/src/github.com/kata-containers/proxy && make && make install
   SHELL
 end
